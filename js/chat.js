@@ -13,6 +13,7 @@ const UniVibeChat = (() => {
   let isNearBottom = true;
   let profileCache = {};
   const knownMessageIds = new Set();
+  const deletingMessageIds = new Set();
   let hasPendingRealtimeBelow = false;
 
   /**
@@ -74,6 +75,23 @@ const UniVibeChat = (() => {
     } catch (e) {
       return '';
     }
+  }
+
+  /**
+   * Renders the small campus-wide General Chat informational notice
+   */
+  function renderInfoNoticeHtml() {
+    return `
+      <div class="chat-info-notice" role="note" aria-label="Campus-wide chat information">
+        <div class="chat-info-notice-title">
+          <span class="chat-info-notice-icon" aria-hidden="true">🌐</span>
+          <span>Campus-wide chat</span>
+        </div>
+        <p class="chat-info-notice-desc">
+          General Chat is a live campus-wide chat. Messages here are visible to everyone on UniVibe.
+        </p>
+      </div>
+    `;
   }
 
   /**
@@ -172,7 +190,7 @@ const UniVibeChat = (() => {
       // Collect user_ids needing profile lookups if not joined
       const missingUserIds = [];
       rows.forEach(r => {
-        knownMessageIds.add(r.id);
+        knownMessageIds.add(String(r.id).trim());
         if (r.profiles) {
           profileCache[r.user_id] = {
             name: r.profiles.name || 'Campus Member',
@@ -214,7 +232,7 @@ const UniVibeChat = (() => {
           avatarUrl: null
         };
         return {
-          id: r.id,
+          id: String(r.id).trim(),
           userId: r.user_id,
           room: r.room,
           content: r.content,
@@ -258,13 +276,16 @@ const UniVibeChat = (() => {
         const newRow = payload.new;
         if (!newRow || !newRow.id) return;
 
+        const cleanNewId = String(newRow.id).trim();
         // Skip if message was already handled (e.g. from local optimistic insert)
-        if (knownMessageIds.has(newRow.id)) return;
-        knownMessageIds.add(newRow.id);
+        if (knownMessageIds.has(cleanNewId) || messages.some(m => String(m.id).toLowerCase() === cleanNewId.toLowerCase())) {
+          return;
+        }
+        knownMessageIds.add(cleanNewId);
 
         const author = await resolveUserProfile(newRow.user_id);
         const newMsg = {
-          id: newRow.id,
+          id: cleanNewId,
           userId: newRow.user_id,
           room: newRow.room,
           content: newRow.content,
@@ -283,9 +304,10 @@ const UniVibeChat = (() => {
         const deletedId = payload.old ? payload.old.id : null;
         if (!deletedId) return;
 
-        knownMessageIds.delete(deletedId);
-        messages = messages.filter(m => m.id !== deletedId);
-        removeMessageFromDom(deletedId);
+        const cleanDeletedId = String(deletedId).trim();
+        knownMessageIds.delete(cleanDeletedId);
+        messages = messages.filter(m => String(m.id).toLowerCase() !== cleanDeletedId.toLowerCase());
+        removeMessageFromDom(cleanDeletedId);
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -294,7 +316,7 @@ const UniVibeChat = (() => {
             dotElem.title = 'Live Realtime Connected';
           }
           if (statusTextElem) {
-            statusTextElem.textContent = 'Live campus stream';
+            statusTextElem.textContent = 'Live';
           }
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           if (dotElem) {
@@ -339,14 +361,28 @@ const UniVibeChat = (() => {
     const stream = document.getElementById('chat-messages-stream');
     if (!stream) return;
 
+    const cleanMsgId = String(msg.id).trim();
+    // Prevent duplicate DOM insertion
+    if (document.getElementById(`chat-msg-${cleanMsgId}`) || stream.querySelector(`[data-msg-id="${cleanMsgId}"]`)) {
+      return;
+    }
+
     // Remove empty state if present
     const emptyState = stream.querySelector('.chat-empty-state');
     if (emptyState) {
       emptyState.remove();
     }
+    // Ensure notice remains at the top
+    if (!stream.querySelector('.chat-info-notice')) {
+      stream.insertAdjacentHTML('afterbegin', renderInfoNoticeHtml());
+    }
 
     const currentUser = window.UniVibeAuth ? window.UniVibeAuth.getCurrentUser() : null;
-    const isOwn = Boolean(currentUser && currentUser.id && msg.userId === currentUser.id);
+    const isOwn = Boolean(
+      currentUser &&
+      currentUser.id &&
+      String(msg.userId || '').toLowerCase() === String(currentUser.id).toLowerCase()
+    );
 
     // Check if we need a day separator
     const lastMsgElem = stream.querySelector('.chat-msg-row:last-of-type');
@@ -409,8 +445,16 @@ const UniVibeChat = (() => {
    * Removes a deleted message from the DOM
    */
   function removeMessageFromDom(messageId) {
-    const row = document.getElementById(`chat-msg-${messageId}`);
+    const cleanId = String(messageId || '').trim();
+    if (!cleanId) return;
+
+    const row = document.getElementById(`chat-msg-${cleanId}`) ||
+                document.querySelector(`.chat-msg-row[data-msg-id="${cleanId}"]`);
     if (row) {
+      if (row.getAttribute('data-deleting') === 'true') {
+        return;
+      }
+      row.setAttribute('data-deleting', 'true');
       row.style.transition = 'opacity 0.2s, transform 0.2s';
       row.style.opacity = '0';
       row.style.transform = 'translateY(4px)';
@@ -533,22 +577,27 @@ const UniVibeChat = (() => {
       }
 
       if (data) {
-        knownMessageIds.add(data.id);
-        const newMsg = {
-          id: data.id,
-          userId: data.user_id,
-          room: data.room,
-          content: data.content,
-          createdAt: data.created_at,
-          author: {
-            name: currentUser.name || 'Campus Member',
-            handle: currentUser.handle ? currentUser.handle.replace(/^@/, '') : 'member',
-            avatarUrl: currentUser.avatarUrl || null
-          }
-        };
+        const cleanDataId = String(data.id).trim();
+        const alreadyHandled = knownMessageIds.has(cleanDataId) || messages.some(m => String(m.id).toLowerCase() === cleanDataId.toLowerCase());
+        knownMessageIds.add(cleanDataId);
 
-        messages.push(newMsg);
-        appendMessageToDom(newMsg);
+        if (!alreadyHandled) {
+          const newMsg = {
+            id: cleanDataId,
+            userId: data.user_id,
+            room: data.room,
+            content: data.content,
+            createdAt: data.created_at,
+            author: {
+              name: currentUser.name || 'Campus Member',
+              handle: currentUser.handle ? currentUser.handle.replace(/^@/, '') : 'member',
+              avatarUrl: currentUser.avatarUrl || null
+            }
+          };
+
+          messages.push(newMsg);
+          appendMessageToDom(newMsg);
+        }
 
         if (textarea) {
           textarea.value = '';
@@ -568,7 +617,8 @@ const UniVibeChat = (() => {
    * Deletes a user's own message
    */
   async function deleteMessage(messageId) {
-    if (!messageId) return;
+    const cleanId = String(messageId || '').trim();
+    if (!cleanId) return;
 
     if (!window.UniVibeAuth || !window.UniVibeAuth.isAuthenticated()) {
       return;
@@ -577,9 +627,25 @@ const UniVibeChat = (() => {
     const currentUser = window.UniVibeAuth.getCurrentUser();
     if (!currentUser || !currentUser.id) return;
 
-    const msg = messages.find(m => m.id === messageId);
-    if (!msg || msg.userId !== currentUser.id) {
-      if (window.UniVibeToast) window.UniVibeToast.show('You can only delete your own messages.');
+    // Prevent concurrent duplicate delete calls on the same message
+    if (deletingMessageIds.has(cleanId.toLowerCase())) {
+      return;
+    }
+
+    const currentUserId = String(currentUser.id).toLowerCase();
+    const msg = messages.find(m => String(m.id).toLowerCase() === cleanId.toLowerCase());
+
+    // If message is present in local memory, verify ownership
+    if (msg) {
+      const msgUserId = String(msg.userId || '').toLowerCase();
+      if (msgUserId !== currentUserId) {
+        if (window.UniVibeToast) window.UniVibeToast.show('You can only delete your own messages.');
+        return;
+      }
+    } else {
+      // If message is not found in memory (already deleted via Realtime or removed),
+      // quietly ensure DOM row is cleaned up without any false warning
+      removeMessageFromDom(cleanId);
       return;
     }
 
@@ -589,11 +655,13 @@ const UniVibeChat = (() => {
     const supabase = window.UniVibeSupabase ? window.UniVibeSupabase.getClient() : null;
     if (!supabase) return;
 
+    deletingMessageIds.add(cleanId.toLowerCase());
+
     try {
       const { error } = await supabase
         .from('chat_messages')
         .delete()
-        .eq('id', messageId)
+        .eq('id', cleanId)
         .eq('user_id', currentUser.id);
 
       if (error) {
@@ -602,15 +670,17 @@ const UniVibeChat = (() => {
         return;
       }
 
-      knownMessageIds.delete(messageId);
-      messages = messages.filter(m => m.id !== messageId);
-      removeMessageFromDom(messageId);
+      knownMessageIds.delete(cleanId);
+      messages = messages.filter(m => String(m.id).toLowerCase() !== cleanId.toLowerCase());
+      removeMessageFromDom(cleanId);
 
       if (window.UniVibeToast) {
         window.UniVibeToast.show('Message deleted.');
       }
     } catch (err) {
       console.error('[UniVibe Chat] Exception deleting message:', err);
+    } finally {
+      deletingMessageIds.delete(cleanId.toLowerCase());
     }
   }
 
@@ -622,6 +692,7 @@ const UniVibeChat = (() => {
 
     if (isLoading && messages.length === 0) {
       streamContainer.innerHTML = `
+        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state" style="opacity: 0.7;">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
           <h3>Connecting to General Chat...</h3>
@@ -636,6 +707,7 @@ const UniVibeChat = (() => {
         (fetchError.message && (fetchError.message.includes('chat_messages') || fetchError.message.includes('relation "public.chat_messages"')));
       if (isMissingTable) {
         streamContainer.innerHTML = `
+          ${renderInfoNoticeHtml()}
           <div class="chat-empty-state">
             <div class="chat-empty-icon" aria-hidden="true" style="color: var(--accent-primary);">⚠️</div>
             <h3>Chat Database Setup Required</h3>
@@ -646,6 +718,7 @@ const UniVibeChat = (() => {
       }
 
       streamContainer.innerHTML = `
+        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
           <h3>Could not load messages</h3>
@@ -658,21 +731,26 @@ const UniVibeChat = (() => {
 
     if (messages.length === 0) {
       streamContainer.innerHTML = `
+        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
-          <h3>Welcome to General Chat!</h3>
-          <p>This is the campus-wide room for all students. Say hello, ask questions, or share what's happening around campus.</p>
+          <h3>Start the conversation.</h3>
+          <p>Say hi to your campus.</p>
         </div>
       `;
       return;
     }
 
     const currentUser = window.UniVibeAuth ? window.UniVibeAuth.getCurrentUser() : null;
-    let html = '';
+    let html = renderInfoNoticeHtml();
     let lastDay = null;
 
     messages.forEach(msg => {
-      const isOwn = Boolean(currentUser && currentUser.id && msg.userId === currentUser.id);
+      const isOwn = Boolean(
+        currentUser &&
+        currentUser.id &&
+        String(msg.userId || '').toLowerCase() === String(currentUser.id).toLowerCase()
+      );
       const currentDay = formatDaySeparator(msg.createdAt);
 
       if (currentDay && currentDay !== lastDay) {
@@ -854,7 +932,7 @@ const UniVibeChat = (() => {
           <div class="chat-header-info">
             <div class="chat-title-row">
               <h1 class="chat-title">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.3">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
                 General Chat
@@ -863,17 +941,18 @@ const UniVibeChat = (() => {
             </div>
             <p class="chat-subtitle">
               <span class="chat-live-dot" id="chat-live-dot" title="Live stream"></span>
-              <span id="chat-status-text">Connecting to campus stream...</span>
+              <span id="chat-status-text">Connecting...</span>
             </p>
           </div>
         </header>
 
         <!-- Message List Container -->
-        <div class="chat-messages-wrap" id="chat-messages-wrap">
+        <div class="chat-messages-wrap chat-messages" id="chat-messages-wrap">
           <div class="chat-messages-stream" id="chat-messages-stream" role="log" aria-live="polite">
+            ${renderInfoNoticeHtml()}
             <div class="chat-empty-state" style="opacity: 0.7;">
               <div class="chat-empty-icon" aria-hidden="true">💬</div>
-              <h3>Loading General Chat...</h3>
+              <h3>Connecting to General Chat...</h3>
               <p>Fetching conversations from campus.</p>
             </div>
           </div>
@@ -886,7 +965,7 @@ const UniVibeChat = (() => {
         </div>
 
         <!-- Footer / Composer -->
-        <footer class="chat-footer" id="chat-footer">
+        <footer class="chat-footer chat-composer" id="chat-footer">
           ${renderFooterHtml()}
         </footer>
       </div>
