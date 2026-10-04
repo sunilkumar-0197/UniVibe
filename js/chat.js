@@ -14,8 +14,6 @@ const UniVibeChat = (() => {
   let profileCache = {};
   const knownMessageIds = new Set();
   let hasPendingRealtimeBelow = false;
-  let isSending = false;
-  let viewportResizeHandler = null;
 
   /**
    * Escape HTML to prevent XSS injection
@@ -76,26 +74,6 @@ const UniVibeChat = (() => {
     } catch (e) {
       return '';
     }
-  }
-
-  /**
-   * Renders the small campus-wide General Chat informational notice
-   */
-  function renderInfoNoticeHtml() {
-    return `
-      <div class="chat-info-notice" role="note" aria-label="Campus Chat Notice">
-        <div class="chat-info-notice-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-        </div>
-        <div class="chat-info-notice-text">
-          <strong>General Chat is a live campus-wide chat.</strong> Messages here are visible to everyone on UniVibe.
-        </div>
-      </div>
-    `;
   }
 
   /**
@@ -338,13 +316,9 @@ const UniVibeChat = (() => {
   }
 
   /**
-   * Unsubscribes from Realtime channel and cleans up mobile view handlers
+   * Unsubscribes from Realtime channel on cleanup
    */
   function cleanup() {
-    cleanupViewportStability();
-    document.body.classList.remove('chat-view-active');
-    document.documentElement.classList.remove('chat-view-active');
-
     if (realtimeChannel) {
       const supabase = window.UniVibeSupabase ? window.UniVibeSupabase.getClient() : null;
       if (supabase) {
@@ -369,10 +343,6 @@ const UniVibeChat = (() => {
     const emptyState = stream.querySelector('.chat-empty-state');
     if (emptyState) {
       emptyState.remove();
-    }
-    // Ensure notice is maintained at the top of the stream
-    if (!stream.querySelector('.chat-info-notice')) {
-      stream.insertAdjacentHTML('afterbegin', renderInfoNoticeHtml());
     }
 
     const currentUser = window.UniVibeAuth ? window.UniVibeAuth.getCurrentUser() : null;
@@ -532,23 +502,10 @@ const UniVibeChat = (() => {
     const supabase = window.UniVibeSupabase ? window.UniVibeSupabase.getClient() : null;
     if (!supabase) return;
 
-    if (isSending) return; // Prevent double submission
-
     const textarea = document.getElementById('chat-input-textarea');
     const sendBtn = document.getElementById('chat-send-btn');
 
-    // Optimistically clear the input immediately so typing feels instant and keyboard stays open
-    const prevValue = textarea ? textarea.value : '';
-    if (textarea) {
-      textarea.value = '';
-      textarea.style.height = 'auto';
-    }
-
-    isSending = true;
-    if (sendBtn) {
-      sendBtn.classList.add('is-sending');
-      sendBtn.style.opacity = '0.7';
-    }
+    if (sendBtn) sendBtn.disabled = true;
 
     try {
       const { data, error } = await supabase
@@ -563,13 +520,6 @@ const UniVibeChat = (() => {
 
       if (error) {
         console.error('[UniVibe Chat] Error inserting message:', error);
-        // Restore input value if message failed to send
-        if (textarea && !textarea.value) {
-          textarea.value = prevValue;
-          textarea.style.height = 'auto';
-          textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-        }
-
         const isMissingTable = error.code === 'PGRST205' ||
           (error.message && (error.message.includes('chat_messages') || error.message.includes('relation "public.chat_messages"')));
         if (isMissingTable) {
@@ -599,21 +549,18 @@ const UniVibeChat = (() => {
 
         messages.push(newMsg);
         appendMessageToDom(newMsg);
+
+        if (textarea) {
+          textarea.value = '';
+          textarea.style.height = 'auto';
+          textarea.focus();
+        }
       }
     } catch (err) {
       console.error('[UniVibe Chat] Exception sending message:', err);
-      if (textarea && !textarea.value) {
-        textarea.value = prevValue;
-        textarea.style.height = 'auto';
-        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-      }
       if (window.UniVibeToast) window.UniVibeToast.show('Failed to send message.');
     } finally {
-      isSending = false;
-      if (sendBtn) {
-        sendBtn.classList.remove('is-sending');
-        sendBtn.style.opacity = '';
-      }
+      if (sendBtn) sendBtn.disabled = false;
     }
   }
 
@@ -675,7 +622,6 @@ const UniVibeChat = (() => {
 
     if (isLoading && messages.length === 0) {
       streamContainer.innerHTML = `
-        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state" style="opacity: 0.7;">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
           <h3>Connecting to General Chat...</h3>
@@ -690,7 +636,6 @@ const UniVibeChat = (() => {
         (fetchError.message && (fetchError.message.includes('chat_messages') || fetchError.message.includes('relation "public.chat_messages"')));
       if (isMissingTable) {
         streamContainer.innerHTML = `
-          ${renderInfoNoticeHtml()}
           <div class="chat-empty-state">
             <div class="chat-empty-icon" aria-hidden="true" style="color: var(--accent-primary);">⚠️</div>
             <h3>Chat Database Setup Required</h3>
@@ -701,7 +646,6 @@ const UniVibeChat = (() => {
       }
 
       streamContainer.innerHTML = `
-        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
           <h3>Could not load messages</h3>
@@ -714,7 +658,6 @@ const UniVibeChat = (() => {
 
     if (messages.length === 0) {
       streamContainer.innerHTML = `
-        ${renderInfoNoticeHtml()}
         <div class="chat-empty-state">
           <div class="chat-empty-icon" aria-hidden="true">💬</div>
           <h3>Welcome to General Chat!</h3>
@@ -725,7 +668,7 @@ const UniVibeChat = (() => {
     }
 
     const currentUser = window.UniVibeAuth ? window.UniVibeAuth.getCurrentUser() : null;
-    let html = renderInfoNoticeHtml();
+    let html = '';
     let lastDay = null;
 
     messages.forEach(msg => {
@@ -837,19 +780,6 @@ const UniVibeChat = (() => {
 
     const form = document.getElementById('chat-composer-form');
     const textarea = document.getElementById('chat-input-textarea');
-    const sendBtn = document.getElementById('chat-send-btn');
-
-    if (sendBtn) {
-      // Prevent tapping/clicking the Send button from blurring the textarea on mobile/pointer devices
-      const preventBlur = (e) => {
-        if (document.activeElement === textarea) {
-          e.preventDefault();
-        }
-      };
-      sendBtn.addEventListener('pointerdown', preventBlur);
-      sendBtn.addEventListener('touchstart', preventBlur);
-      sendBtn.addEventListener('mousedown', preventBlur);
-    }
 
     if (form && textarea) {
       // Auto-expand textarea as user types
@@ -892,64 +822,11 @@ const UniVibeChat = (() => {
   }
 
   /**
-   * Listens to visualViewport changes on mobile devices to smoothly adjust the chat container
-   * above the virtual keyboard without page bouncing or scroll jumping.
-   */
-  function setupViewportStability() {
-    if (!window.visualViewport) return;
-
-    if (viewportResizeHandler) {
-      window.visualViewport.removeEventListener('resize', viewportResizeHandler);
-      window.visualViewport.removeEventListener('scroll', viewportResizeHandler);
-    }
-
-    viewportResizeHandler = () => {
-      const container = document.getElementById('chat-view-container');
-      if (!container) return;
-
-      if (window.innerWidth >= 768) {
-        container.style.removeProperty('--chat-keyboard-offset');
-        return;
-      }
-
-      const offsetTop = window.visualViewport.offsetTop || 0;
-      const heightDiff = window.innerHeight - window.visualViewport.height - offsetTop;
-
-      if (heightDiff > 120) {
-        container.style.setProperty('--chat-keyboard-offset', `${Math.round(heightDiff)}px`);
-        scrollToBottom(false);
-      } else {
-        container.style.removeProperty('--chat-keyboard-offset');
-      }
-    };
-
-    window.visualViewport.addEventListener('resize', viewportResizeHandler, { passive: true });
-    window.visualViewport.addEventListener('scroll', viewportResizeHandler, { passive: true });
-  }
-
-  function cleanupViewportStability() {
-    if (viewportResizeHandler && window.visualViewport) {
-      window.visualViewport.removeEventListener('resize', viewportResizeHandler);
-      window.visualViewport.removeEventListener('scroll', viewportResizeHandler);
-      viewportResizeHandler = null;
-    }
-    const container = document.getElementById('chat-view-container');
-    if (container) {
-      container.style.removeProperty('--chat-keyboard-offset');
-    }
-  }
-
-  /**
    * Main entry point to render the Chat view in the application
    */
   async function renderChatView(container) {
     if (!container) return;
     containerRef = container;
-
-    // Activate mobile viewport lock & keyboard stability
-    document.body.classList.add('chat-view-active');
-    document.documentElement.classList.add('chat-view-active');
-    setupViewportStability();
 
     // Ensure session detection has finished before deciding guest vs authenticated
     if (window.UniVibeAuth && typeof window.UniVibeAuth.waitForAuth === 'function') {
