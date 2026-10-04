@@ -1,0 +1,12 @@
+# Environment files containing secrets
+.env
+.env.local
+.env.*.local
+env.js
+
+# IDE / OS files
+.DS_Store
+Thumbs.db
+
+# Local logs
+edge.log

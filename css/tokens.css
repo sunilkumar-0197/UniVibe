@@ -1,0 +1,150 @@
+/* ==========================================================================
+   UniVibe Design System Tokens
+   ========================================================================== */
+
+:root {
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Animation Timings */
+  --ease-out-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce-soft: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 380ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Spacing */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Border Radii - Soft and Cozy */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;
+
+  /* Z-Index Hierarchy */
+  --z-base: 1;
+  --z-nav: 100;
+  --z-fab: 200;
+  --z-modal-backdrop: 500;
+  --z-modal: 600;
+  --z-toast: 800;
+  --z-intro: 9999;
+}
+
+/* ==========================================================================
+   LIGHT MODE (UniVibe warm cream & charcoal brand treatment)
+   ========================================================================== */
+:root[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  /* Backgrounds */
+  --bg-page: #FAF7F2;                /* Warm cream background */
+  --bg-surface: #FFFFFF;             /* Warm white cards */
+  --bg-surface-hover: #F6F2EA;
+  --bg-surface-secondary: #F2ECE2;   /* Soft warm beige secondary surface */
+  --bg-surface-tertiary: #EAE3D6;
+  --bg-input: #F7F3EC;
+  --bg-overlay: rgba(38, 32, 29, 0.45);
+
+  /* Text Colors */
+  --text-primary: #292320;           /* Dark charcoal / deep-brown */
+  --text-secondary: #6B625B;         /* Warm muted brown-gray */
+  --text-tertiary: #968D85;          /* Subtle metadata text */
+  --text-inverse: #FAF7F2;
+
+  /* Borders & Dividers */
+  --border-subtle: #E8E2D7;          /* Restrained, soft borders */
+  --border-strong: #D5CCC0;
+  --border-focus: #D96B43;
+
+  /* Accent Colors */
+  --accent-primary: #D96B43;         /* Muted soft orange accent */
+  --accent-hover: #C55E37;
+  --accent-active: #B2522C;
+  --accent-soft: rgba(217, 107, 67, 0.12);
+  --accent-text: #FFFFFF;
+
+  /* Supporting Botanical & Campus Colors */
+  --color-sage: #5E8268;             /* Muted sage green */
+  --color-sage-soft: rgba(94, 130, 104, 0.12);
+  --color-dusty-blue: #527993;        /* Dusty blue */
+  --color-dusty-blue-soft: rgba(82, 121, 147, 0.12);
+  --color-terracotta: #C9684C;
+  --color-gold: #C48B3F;
+  --color-gold-soft: rgba(196, 139, 63, 0.14);
+  --color-error: #C84630;
+  --color-error-soft: rgba(200, 70, 48, 0.1);
+  --color-error-border: rgba(200, 70, 48, 0.28);
+
+  /* Shadows (Subtle, never exaggerated) */
+  --shadow-xs: 0 1px 2px rgba(41, 35, 32, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(41, 35, 32, 0.05), 0 1px 3px rgba(41, 35, 32, 0.03);
+  --shadow-md: 0 6px 18px -4px rgba(41, 35, 32, 0.07), 0 2px 6px rgba(41, 35, 32, 0.04);
+  --shadow-lg: 0 16px 36px -6px rgba(41, 35, 32, 0.09), 0 4px 12px rgba(41, 35, 32, 0.04);
+  --shadow-fab: 0 8px 24px -4px rgba(217, 107, 67, 0.35), 0 2px 6px rgba(41, 35, 32, 0.08);
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   DARK MODE (UniVibe warm dark-charcoal brand treatment)
+   ========================================================================== */
+:root[data-theme="dark"] {
+  /* Backgrounds (Warm dark charcoal, NEVER pure black) */
+  --bg-page: #191716;                /* Warm dark charcoal */
+  --bg-surface: #24211F;             /* Slightly lighter charcoal surface */
+  --bg-surface-hover: #2D2926;
+  --bg-surface-secondary: #2C2825;   /* Secondary surface */
+  --bg-surface-tertiary: #38332F;
+  --bg-input: #1F1C1B;
+  --bg-overlay: rgba(10, 9, 8, 0.7);
+
+  /* Text Colors */
+  --text-primary: #F5EFEB;           /* Warm off-white */
+  --text-secondary: #A8A099;         /* Muted warm-gray secondary text */
+  --text-tertiary: #78716A;
+  --text-inverse: #191716;
+
+  /* Borders & Dividers */
+  --border-subtle: #36322E;          /* Restrained warm dark borders */
+  --border-strong: #48423D;
+  --border-focus: #E27A55;
+
+  /* Accent Colors (Slightly adjusted for dark contrast) */
+  --accent-primary: #E27A55;         /* Muted soft orange accent */
+  --accent-hover: #EC8865;
+  --accent-active: #D46A45;
+  --accent-soft: rgba(226, 122, 85, 0.18);
+  --accent-text: #191716;
+
+  /* Supporting Botanical & Campus Colors */
+  --color-sage: #7EA88A;             /* Muted sage green */
+  --color-sage-soft: rgba(126, 168, 138, 0.18);
+  --color-dusty-blue: #78A0B8;       /* Dusty blue */
+  --color-dusty-blue-soft: rgba(120, 160, 184, 0.18);
+  --color-terracotta: #D87B60;
+  --color-gold: #D8A55C;
+  --color-gold-soft: rgba(216, 165, 92, 0.18);
+  --color-error: #E57373;
+  --color-error-soft: rgba(229, 115, 115, 0.16);
+  --color-error-border: rgba(229, 115, 115, 0.32);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 3px 10px -2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 48px -6px rgba(0, 0, 0, 0.6);
+  --shadow-fab: 0 8px 26px -4px rgba(226, 122, 85, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
+}

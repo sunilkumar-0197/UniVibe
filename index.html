@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="UniVibe — A space full of goooood vibes. A warm, cozy campus social hangout for students.">
+  <meta name="theme-color" content="#FAF7F2">
+  <title>UniVibe — A space full of goooood vibes.</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for warm, modern geometric clarity -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;450;500;600;700;750;800&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/feed.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. OPENING / INTRO SCREEN
+       Minimal, full-screen opening experience.
+       Wordmark scales down gracefully; tagline reveals smoothly underneath.
+       Transition into Home after ~2.0 seconds.
+       ======================================================================== -->
+  <div id="intro-screen" role="region" aria-label="UniVibe opening experience">
+    <div class="intro-content">
+      <!-- Calm organic mark -->
+      <div class="intro-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M8 12c1.5 2 4.5 2 6 0"/>
+          <circle cx="9" cy="9" r="1" fill="currentColor"/>
+          <circle cx="15" cy="9" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <!-- App Name: Exactly UniVibe -->
+      <h1 class="intro-brand">
+        UniVibe<span class="brand-dot">.</span>
+      </h1>
+
+      <!-- Tagline: Animated with smooth typewriter effect -->
+      <p class="intro-tagline" aria-label="A space full of goooood vibes.">
+        <span class="typewriter-char">A</span><span class="typewriter-char"> </span><span class="typewriter-char">s</span><span class="typewriter-char">p</span><span class="typewriter-char">a</span><span class="typewriter-char">c</span><span class="typewriter-char">e</span><span class="typewriter-char"> </span><span class="typewriter-char">f</span><span class="typewriter-char">u</span><span class="typewriter-char">l</span><span class="typewriter-char">l</span><span class="typewriter-char"> </span><span class="typewriter-char">o</span><span class="typewriter-char">f</span><span class="typewriter-char"> </span><span class="vibe-stretch"><span class="typewriter-char">g</span><span class="typewriter-char">o</span><span class="typewriter-char">o</span><span class="typewriter-char">o</span><span class="typewriter-char">o</span><span class="typewriter-char">o</span><span class="typewriter-char">d</span></span><span class="typewriter-char"> </span><span class="typewriter-char">v</span><span class="typewriter-char">i</span><span class="typewriter-char">b</span><span class="typewriter-char">e</span><span class="typewriter-char">s</span><span class="typewriter-char">.</span>
+      </p>
+    </div>
+
+    <!-- Discreet skip affordance if user is in a hurry -->
+    <button id="intro-skip-btn" class="intro-footnote" aria-label="Skip intro and enter campus feed">
+      Enter Campus Feed →
+    </button>
+  </div>
+
+  <!-- ========================================================================
+       STARTUP AUTHENTICATION SCREEN
+       (Intro → Login / Sign Up / Continue without login)
+       ======================================================================== -->
+  <div id="auth-startup-screen" class="auth-startup-screen auth-hidden" role="region" aria-label="UniVibe Authentication">
+    <div class="auth-startup-card">
+      <div class="auth-brand-header">
+        <div class="auth-brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            <path d="M8 12c1.5 2 4.5 2 6 0"/>
+            <circle cx="9" cy="9" r="1" fill="currentColor"/>
+            <circle cx="15" cy="9" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <h1 class="auth-brand-title">Welcome to UniVibe<span class="brand-dot">.</span></h1>
+        <p class="auth-brand-subtitle">A space full of goooood vibes.</p>
+      </div>
+
+      <!-- Main 3 options view -->
+      <div id="auth-choice-view" class="auth-options-group">
+        <button class="auth-btn-option btn-login" id="btn-choice-login">
+          Log In
+        </button>
+        <button class="auth-btn-option btn-signup" id="btn-choice-signup">
+          Sign Up
+        </button>
+        <button class="auth-btn-option btn-guest" id="btn-choice-guest">
+          Continue without login
+        </button>
+      </div>
+
+      <!-- Already Authenticated Auto-Continue View -->
+      <div id="auth-authed-view" class="auth-authed-card" style="display: none;">
+        <div class="user-avatar-badge" id="auth-authed-avatar" style="width: 58px; height: 58px; font-size: 1.3rem; margin: 0 auto 14px; background-color: var(--accent-soft); color: var(--accent-primary); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 700;">G</div>
+        <div style="font-weight: 700; font-size: 1.15rem; color: var(--text-primary); margin-bottom: 2px;" id="auth-authed-name"></div>
+        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 18px;" id="auth-authed-handle"></div>
+        <div class="auth-authed-status" style="font-size: 0.875rem; color: var(--accent-primary); font-weight: 550; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <span class="status-dot"></span>
+          <span>Logged in · Automatically continuing to Home...</span>
+        </div>
+        <button type="button" class="auth-btn-text" id="btn-authed-switch" style="margin-top: 14px; font-size: 0.825rem; color: var(--text-tertiary); background: none; border: none; cursor: pointer; text-decoration: underline;">Switch account</button>
+      </div>
+
+      <!-- Log In Form -->
+      <div id="auth-login-view" class="auth-form-card" style="display: none;">
+        <h3 class="auth-form-title">Welcome Back</h3>
+        <form id="form-login">
+          <div class="auth-form-error" id="login-error-banner" role="alert" style="display: none;"></div>
+          <div class="form-group">
+            <label class="form-label" for="login-identifier">Email or Campus Handle</label>
+            <input type="text" id="login-identifier" class="form-input" placeholder="Enter your email or handle" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Log In</button>
+          <button type="button" class="btn-secondary" id="btn-login-back" style="width: 100%; margin-top: 8px;">Back</button>
+          <p class="auth-switch-links">
+            New to campus? <a href="#" id="link-switch-signup">Sign up</a> · <a href="#" id="link-login-guest">Continue as guest</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Sign Up Form -->
+      <div id="auth-signup-view" class="auth-form-card" style="display: none;">
+        <h3 class="auth-form-title">Join UniVibe</h3>
+        <form id="form-signup">
+          <div class="auth-form-error" id="signup-error-banner" role="alert" style="display: none;"></div>
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" class="form-input" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email</label>
+            <input type="email" id="signup-email" class="form-input" placeholder="you@university.edu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-handle">Campus Handle & Major</label>
+            <input type="text" id="signup-handle" class="form-input" placeholder="e.g. @handle" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Create Password</label>
+            <input type="password" id="signup-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Sign Up</button>
+          <button type="button" class="btn-secondary" id="btn-signup-back" style="width: 100%; margin-top: 8px;">Back</button>
+          <p class="auth-switch-links">
+            Already have an account? <a href="#" id="link-switch-login">Log In</a> · <a href="#" id="link-signup-guest">Continue as guest</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       WELCOME TRANSITION SCREEN
+       (Displays "Welcome." and smoothly morphs to "Welcome to UniVibe" before revealing Home)
+       ======================================================================== -->
+  <div id="welcome-screen" class="welcome-screen welcome-hidden" aria-hidden="true">
+    <div class="welcome-content">
+      <h1 class="welcome-brand-text">
+        <span class="welcome-morph welcome-morph-1">Welcome<span class="brand-dot">.</span></span>
+        <span class="welcome-morph welcome-morph-2">Welcome to UniVibe<span class="brand-dot">.</span></span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       2. MASTER APPLICATION SHELL
+       Revealed smoothly as the intro completes.
+       ======================================================================== -->
+  <div class="app-shell" id="app-shell" style="display: none;">
+
+    <!-- Mobile Top Header (< 768px) -->
+    <header class="mobile-header" role="banner">
+      <div class="mobile-header-left">
+        <a href="#" class="mobile-brand" aria-label="UniVibe Home">
+          <div class="brand-icon-box" style="width: 28px; height: 28px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              <path d="M8 12c1.5 2 4.5 2 6 0"/>
+            </svg>
+          </div>
+          <span class="brand-wordmark" style="font-size: 1.25rem;">UniVibe<span class="brand-dot">.</span></span>
+        </a>
+      </div>
+
+      <div class="mobile-header-actions">
+        <!-- Discreet theme toggle for quick preview on mobile -->
+        <button class="mobile-icon-btn" data-action="toggle-theme" aria-label="Toggle theme">
+          <span class="theme-icon-indicator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="mobile-icon-btn" id="btn-mobile-auth" data-action="logout-action" title="Log Out" aria-label="Log Out" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Desktop 3-Column Layout Frame -->
+    <div class="app-layout">
+
+      <!-- ====================================================================
+           COLUMN 1: Left Navigation Sidebar (Desktop)
+           ==================================================================== -->
+      <aside class="sidebar-left" role="navigation" aria-label="Main Navigation">
+        <!-- UniVibe Branding -->
+        <a href="#" class="sidebar-brand" aria-label="UniVibe Home">
+          <div class="brand-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              <path d="M8 12c1.5 2 4.5 2 6 0"/>
+              <circle cx="9" cy="9" r="1" fill="currentColor"/>
+              <circle cx="15" cy="9" r="1" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="brand-title-wrap">
+            <span class="brand-wordmark">UniVibe<span class="brand-dot">.</span></span>
+          </div>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <ul class="nav-menu">
+          <li>
+            <a href="#home" class="nav-item-link active" aria-current="page" onclick="UniVibeFeed.setFilter('all')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              <span>Home</span>
+              <span class="nav-indicator"></span>
+            </a>
+          </li>
+          <li>
+            <a href="#events" class="nav-item-link" onclick="UniVibeFeed.setFilter('event')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <span>Events</span>
+            </a>
+          </li>
+          <li>
+            <a href="#clubs" class="nav-item-link" onclick="UniVibeFeed.setFilter('clubs')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Clubs</span>
+            </a>
+          </li>
+          <li>
+            <a href="#profile" class="nav-item-link" onclick="UniVibeFeed.setFilter('profile')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Profile</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Quick Sidebar Create Button -->
+        <button class="sidebar-create-btn" data-action="open-create" data-tab="post">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Share a Vibe</span>
+        </button>
+
+        <!-- Sidebar Footer: Profile & Utility Controls -->
+        <div class="sidebar-footer">
+          <a href="#profile" class="user-mini-card" id="sidebar-user-card" onclick="UniVibeFeed.setFilter('profile')">
+            <div class="user-avatar-sm user-avatar-badge" id="sidebar-user-avatar" aria-hidden="true">G</div>
+            <div class="user-info">
+              <span class="user-name" id="sidebar-user-name">Guest</span>
+              <span class="user-handle" id="sidebar-user-handle">Exploring UniVibe</span>
+            </div>
+          </a>
+
+          <div class="sidebar-utility-row">
+            <!-- Theme Switcher (System Preference Default) -->
+            <button class="utility-btn" data-action="toggle-theme" title="Detected from system. Click to toggle light/dark mode.">
+              <span class="theme-icon-indicator">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </span>
+              <span class="theme-label-indicator">Dark Mode</span>
+            </button>
+
+            <!-- Authentication Action (Log Out) -->
+            <button class="utility-btn" id="btn-sidebar-auth" data-action="logout-action" title="Sign out of UniVibe" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span id="label-sidebar-auth">Log Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ====================================================================
+           COLUMN 2: Main Social Feed (Center Stage)
+           ==================================================================== -->
+      <main class="main-feed-area" role="main">
+        <div class="feed-header campus-stories-header feed-welcome-banner" id="main-feed-header">
+          <h1 class="stories-title">Campus Stories</h1>
+          <p class="stories-subtitle">Moments, ideas &amp; conversations from campus.</p>
+        </div>
+
+        <!-- Social Posts & Event Cards Stream (Rendered by JS) -->
+        <section class="feed-stream" id="feed-stream" aria-live="polite">
+          <!-- Populated by js/feed.js -->
+        </section>
+      </main>
+
+      <!-- ====================================================================
+           COLUMN 3: Right Contextual Area (Desktop Context)
+           ==================================================================== -->
+      <aside class="sidebar-right" role="complementary" aria-label="Campus Context and Events">
+
+        <!-- Widget 1: Happening This Week -->
+        <div class="context-widget">
+          <div class="widget-header">
+            <h3 class="widget-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Happening This Week
+            </h3>
+            <a href="#events" class="widget-link" onclick="UniVibeFeed.setFilter('event')">View all</a>
+          </div>
+
+          <ul class="widget-event-list" id="widget-event-list">
+            <li class="widget-empty-sub">No upcoming events yet.</li>
+          </ul>
+        </div>
+
+        <!-- Widget 2: Popular Campus Clubs -->
+        <div class="context-widget">
+          <div class="widget-header">
+            <h3 class="widget-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              Active Campus Clubs
+            </h3>
+            <a href="#clubs" class="widget-link" onclick="UniVibeFeed.setFilter('clubs')">Explore</a>
+          </div>
+
+          <ul class="widget-club-list" id="widget-club-list">
+            <li class="widget-empty-sub">No active clubs yet.</li>
+          </ul>
+        </div>
+
+
+        <p class="sidebar-footer-note">
+          UniVibe is a student-crafted social space. Warm vibes, friendly faces, and good times on campus.
+        </p>
+      </aside>
+
+    </div><!-- /.app-layout -->
+
+    <!-- ====================================================================
+         FLOATING + CREATE BUTTON
+         Fixed at bottom-right, muted orange accent, easily accessible
+         ==================================================================== -->
+    <button class="fab-create" data-action="open-create" data-tab="post" aria-label="Create post or event">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      <span>Create</span>
+    </button>
+
+    <!-- ====================================================================
+         MOBILE BOTTOM NAVIGATION BAR (< 768px)
+         Events | Home | Clubs | Profile
+         Home is in the central, primary position.
+         ==================================================================== -->
+    <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile Navigation">
+      <!-- 1. Events -->
+      <a href="#events" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('event')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>Events</span>
+      </a>
+
+      <!-- 2. Home (Central & Primary) -->
+      <a href="#home" class="bottom-nav-item nav-home-primary active" aria-current="page" onclick="UniVibeFeed.setFilter('all')">
+        <div class="home-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <span>Home</span>
+      </a>
+
+      <!-- 3. Clubs -->
+      <a href="#clubs" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('clubs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>Clubs</span>
+      </a>
+
+      <!-- 4. Profile -->
+      <a href="#profile" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+  </div><!-- /.app-shell -->
+
+  <!-- ========================================================================
+       3. CREATION MODAL (Create Post / Create Event)
+       Interactive placeholder dialog for campus vibes and events.
+       ======================================================================== -->
+  <div class="modal-backdrop" id="create-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-window">
+      <!-- Modal Header with Tab Switcher -->
+      <div class="modal-header">
+        <div class="modal-tabs" role="tablist">
+          <button class="modal-tab-btn active" role="tab" data-tab="post" id="tab-btn-post">
+            Create Post
+          </button>
+          <button class="modal-tab-btn" role="tab" data-tab="event" id="tab-btn-event">
+            Create Event
+          </button>
+          <button class="modal-tab-btn" role="tab" data-tab="club" id="tab-btn-club">
+            Create Club
+          </button>
+        </div>
+        <button class="modal-close-btn" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tab 1: Create Post Form -->
+      <form id="form-create-post">
+        <div class="modal-body" id="tab-create-post">
+          <div class="composer-author-row">
+            <div class="composer-user-avatar user-avatar-badge" aria-hidden="true">G</div>
+            <div>
+              <div id="composer-author-name" style="font-weight: 700; font-size: 0.95rem;">Guest</div>
+              <select class="composer-audience-select" id="post-club-select">
+                <option value="general">🌍 General Campus</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="post-title-input">Title *</label>
+            <input class="form-input" type="text" id="post-title-input" placeholder="e.g. Anyone going to the hackathon?" maxlength="140" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="post-caption-input">Your Vibe *</label>
+            <textarea class="form-textarea" id="post-caption-input" placeholder="What's happening? A quiet study spot, sunset on the lawn, or thoughts on midterms..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="post-tags-input">Tags</label>
+            <input class="form-input" type="text" id="post-tags-input" placeholder="#hackathon #teambuilding (space separated)">
+          </div>
+
+          <div class="form-group composer-media-group">
+            <div class="composer-media-header">
+              <label class="form-label" style="margin-bottom: 0;">Photos (up to 4)</label>
+              <span class="composer-media-counter" id="post-photos-counter">0 / 4</span>
+            </div>
+            <div class="composer-media-dropzone" id="post-media-dropzone">
+              <div class="composer-media-preview-list" id="post-media-preview-list" style="display: none;"></div>
+              <button type="button" class="btn-attach-photos" id="btn-post-attach-photos">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span>Add Photos</span>
+              </button>
+              <input type="file" id="post-photos-input" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display: none;">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-action="cancel-create">Cancel</button>
+          <button type="submit" class="btn-primary">Share to Campus</button>
+        </div>
+      </form>
+
+      <!-- Tab 2: Create Event Form -->
+      <form id="form-create-event" style="display: none;">
+        <div class="modal-body" id="tab-create-event">
+          <div class="form-group">
+            <label class="form-label" for="event-title-input">Title *</label>
+            <input class="form-input" type="text" id="event-title-input" placeholder="e.g. Sunset Acoustic Jam & Hot Cider" required>
+          </div>
+
+          <div class="modal-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="event-date-input">Date *</label>
+              <input class="form-input" type="date" id="event-date-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="event-time-input">Time *</label>
+              <input class="form-input" type="time" id="event-time-input" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-location-input">Location *</label>
+            <input class="form-input" type="text" id="event-location-input" placeholder="e.g. Student Center or Campus Lawn" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-desc-input">Description *</label>
+            <textarea class="form-textarea" id="event-desc-input" placeholder="Describe the event, who is welcome, and what to expect..." style="min-height: 85px;" required></textarea>
+          </div>
+
+          <div class="form-group composer-media-group">
+            <div class="composer-media-header">
+              <label class="form-label" style="margin-bottom: 0;">Photos (up to 4)</label>
+              <span class="composer-media-counter" id="event-photos-counter">0 / 4</span>
+            </div>
+            <div class="composer-media-dropzone" id="event-media-dropzone">
+              <div class="composer-media-preview-list" id="event-media-preview-list" style="display: none;"></div>
+              <button type="button" class="btn-attach-photos" id="btn-event-attach-photos">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span>Add Photos</span>
+              </button>
+              <input type="file" id="event-photos-input" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="display: none;">
+            </div>
+          </div>
+
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-action="cancel-create">Cancel</button>
+          <button type="submit" class="btn-primary">Publish Event</button>
+        </div>
+      </form>
+
+      <!-- Tab 3: Create Club Form -->
+      <form id="form-create-club" style="display: none;">
+        <div class="modal-body" id="tab-create-club">
+          <!-- Optional Club Logo Picker -->
+          <div class="form-group">
+            <label class="form-label" style="display: block; margin-bottom: 6px;">Club Logo (Optional)</label>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div id="create-club-logo-preview" style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--bg-surface-secondary); border: 1px dashed var(--border-subtle); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; color: var(--text-tertiary); font-size: 1.25rem;">
+                📷
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-secondary" id="btn-club-attach-logo" style="padding: 6px 12px; font-size: 0.8rem;">
+                    Upload Logo
+                  </button>
+                  <button type="button" class="btn-secondary" id="btn-club-remove-logo" style="padding: 6px 12px; font-size: 0.8rem; color: var(--danger-primary, #ef4444); display: none;">
+                    Remove
+                  </button>
+                </div>
+                <input type="file" id="club-logo-input" accept="image/*" style="display: none;">
+                <span style="font-size: 0.75rem; color: var(--text-tertiary);">PNG, JPG, or WebP. Max 10MB.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="club-name-input">Club Name *</label>
+            <input class="form-input" type="text" id="club-name-input" placeholder="e.g. Robotics &amp; AI Club" maxlength="80" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="club-desc-input">Description *</label>
+            <textarea class="form-textarea" id="club-desc-input" placeholder="Describe the club's mission, activities, meetings, and who should join..." style="min-height: 95px;" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="club-limit-input">Member Limit (Optional)</label>
+            <input class="form-input" type="number" id="club-limit-input" min="1" placeholder="e.g. 50 (leave empty for unlimited)">
+            <span style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; display: block;">
+              Optional maximum number of members. Leave empty for unlimited.
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-action="cancel-create">Cancel</button>
+          <button type="submit" class="btn-primary">Create Club</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Club Detail Modal -->
+  <div class="modal-backdrop" id="club-detail-modal" role="dialog" aria-modal="true" aria-labelledby="club-modal-title" style="display: none;">
+    <div class="modal-window" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="club-modal-title" style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">Club Overview</h3>
+        <button class="modal-close-btn" data-action="close-club-detail" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="club-detail-content" style="display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-lg);">
+        <!-- Injected dynamically by UniVibeFeed -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Club Edit Settings Modal (Owner Only) -->
+  <div class="modal-backdrop" id="club-edit-modal" role="dialog" aria-modal="true" aria-labelledby="club-edit-modal-title" style="display: none;">
+    <div class="modal-window" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="club-edit-modal-title" style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">Edit Club Settings</h3>
+        <button class="modal-close-btn" data-action="close-club-edit" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <form id="form-edit-club">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-lg);">
+          <input type="hidden" id="edit-club-id">
+
+          <!-- Club Logo Management -->
+          <div class="form-group">
+            <label class="form-label" style="display: block; margin-bottom: 6px; font-weight: 650;">Club Logo</label>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div id="edit-club-logo-preview" style="width: 58px; height: 58px; border-radius: var(--radius-md); overflow: hidden; background: var(--bg-surface-secondary); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 1.25rem;">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-secondary" id="btn-edit-club-upload-logo" style="padding: 6px 12px; font-size: 0.8rem;">
+                    Upload Logo
+                  </button>
+                  <button type="button" class="btn-secondary" id="btn-edit-club-remove-logo" style="padding: 6px 12px; font-size: 0.8rem; color: var(--danger-primary, #ef4444); display: none;">
+                    Remove Logo
+                  </button>
+                </div>
+                <input type="file" id="edit-club-logo-input" accept="image/*" style="display: none;">
+                <span style="font-size: 0.75rem; color: var(--text-tertiary);">PNG, JPG, or WebP. Max 10MB.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Club Name Input -->
+          <div class="form-group">
+            <label class="form-label" for="edit-club-name-input">Club Name *</label>
+            <input class="form-input" type="text" id="edit-club-name-input" maxlength="80" required>
+          </div>
+
+          <!-- Member Limit Input -->
+          <div class="form-group">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <label class="form-label" for="edit-club-limit-input" style="margin: 0;">Member Limit</label>
+              <span id="edit-club-current-count-hint" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;"></span>
+            </div>
+            <input class="form-input" type="number" id="edit-club-limit-input" min="1" placeholder="Leave empty for unlimited">
+            <span style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; display: block;">
+              Leave blank for no member limit. Cannot be set lower than the current member count.
+            </span>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--border-subtle);">
+          <button type="button" class="btn-secondary" data-action="close-club-edit">Cancel</button>
+          <button type="submit" class="btn-primary" id="btn-save-club-edit">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Guest Restricted Action Modal ("Sign in to do this.") -->
+  <div class="modal-backdrop" id="guest-auth-modal" role="dialog" aria-modal="true" aria-labelledby="guest-auth-title" style="display: none;">
+    <div class="modal-window auth-prompt-window">
+      <!-- Choice View -->
+      <div id="prompt-choice-view">
+        <div class="auth-prompt-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            <path d="M8 12c1.5 2 4.5 2 6 0"/>
+            <circle cx="9" cy="9" r="1" fill="currentColor"/>
+            <circle cx="15" cy="9" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+        <h3 class="auth-prompt-title" id="guest-auth-title">Sign in to do this.</h3>
+        <p class="auth-prompt-desc">Create posts, host events, and vibe with the campus community.</p>
+        <div class="auth-prompt-actions">
+          <button class="btn-primary" id="btn-prompt-login" style="width: 100%;">Log In</button>
+          <button class="btn-secondary" id="btn-prompt-signup" style="width: 100%;">Sign Up</button>
+          <button type="button" class="auth-btn-text" id="btn-prompt-dismiss" style="margin-top: 6px;">Stay as Guest</button>
+        </div>
+      </div>
+
+      <!-- Quick Login View inside modal -->
+      <div id="prompt-login-view" style="display: none; text-align: left;">
+        <h3 class="auth-form-title">Log In to UniVibe</h3>
+        <form id="form-modal-login">
+          <div class="auth-form-error" id="modal-login-error-banner" role="alert" style="display: none;"></div>
+          <div class="form-group">
+            <label class="form-label" for="modal-login-identifier">Email or Handle</label>
+            <input type="text" id="modal-login-identifier" class="form-input" placeholder="Enter your email or handle" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-login-password">Password</label>
+            <input type="password" id="modal-login-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Log In</button>
+          <button type="button" class="btn-secondary" id="btn-modal-login-back" style="width: 100%; margin-top: 8px;">Back</button>
+        </form>
+      </div>
+
+      <!-- Quick Signup View inside modal -->
+      <div id="prompt-signup-view" style="display: none; text-align: left;">
+        <h3 class="auth-form-title">Sign Up for UniVibe</h3>
+        <form id="form-modal-signup">
+          <div class="auth-form-error" id="modal-signup-error-banner" role="alert" style="display: none;"></div>
+          <div class="form-group">
+            <label class="form-label" for="modal-signup-name">Full Name</label>
+            <input type="text" id="modal-signup-name" class="form-input" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-signup-email">Email</label>
+            <input type="email" id="modal-signup-email" class="form-input" placeholder="you@university.edu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-signup-handle">Campus Handle & Major</label>
+            <input type="text" id="modal-signup-handle" class="form-input" placeholder="e.g. @handle" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-signup-password">Password</label>
+            <input type="password" id="modal-signup-password" class="form-input" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+          <button type="button" class="btn-secondary" id="btn-modal-signup-back" style="width: 100%; margin-top: 8px;">Back</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal-backdrop" id="edit-profile-modal" role="dialog" aria-modal="true" aria-labelledby="edit-profile-modal-title" style="display: none;">
+    <div class="modal-window" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="edit-profile-modal-title" style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">Edit Profile</h3>
+        <button class="modal-close-btn" data-action="close-edit-profile" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: var(--space-lg);">
+        <form id="form-edit-profile">
+          <div class="auth-form-error" id="edit-profile-error" role="alert" style="display: none; margin-bottom: var(--space-md);"></div>
+
+          <!-- Profile Picture Management -->
+          <div class="edit-profile-avatar-section">
+            <div class="edit-profile-avatar-preview-wrap">
+              <div class="author-avatar avatar-badge edit-profile-avatar-preview" id="edit-profile-avatar-preview">
+                UV
+              </div>
+              <div class="edit-profile-avatar-actions">
+                <button type="button" class="btn-avatar-upload" id="btn-avatar-upload">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                  <span id="btn-avatar-upload-text">Upload Photo</span>
+                </button>
+                <input type="file" id="edit-profile-avatar-file" accept="image/jpeg,image/png,image/webp,image/gif" style="display: none;">
+                <button type="button" class="btn-avatar-remove" id="btn-avatar-remove" style="display: none;">
+                  Remove Photo
+                </button>
+              </div>
+            </div>
+            <span class="edit-profile-avatar-hint">JPG, PNG, WebP up to 5MB. Resized automatically.</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-md);">
+            <label class="form-label" for="edit-profile-name">Full Name</label>
+            <input type="text" id="edit-profile-name" class="form-input" placeholder="Your full name" required maxlength="50">
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-md);">
+            <label class="form-label" for="edit-profile-handle">Campus Handle</label>
+            <input type="text" id="edit-profile-handle" class="form-input" placeholder="e.g. ISE_3rd sem" required maxlength="30">
+            <span style="font-size: 0.78rem; color: var(--text-tertiary); display: block; margin-top: 4px;">2–30 characters. Letters, numbers, spaces, underscores, dots, brackets, and parentheses.</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-lg);">
+            <label class="form-label" for="edit-profile-bio">Bio</label>
+            <textarea id="edit-profile-bio" class="form-input" placeholder="Tell campus what you're up to, your major, interests, etc..." rows="3" maxlength="250" style="resize: vertical; font-family: inherit; font-size: 0.9rem; line-height: 1.5;"></textarea>
+            <span style="font-size: 0.78rem; color: var(--text-tertiary); display: block; margin-top: 4px; text-align: right;" id="edit-profile-bio-counter">0 / 250</span>
+          </div>
+
+          <div style="display: flex; gap: var(--space-sm); justify-content: flex-end;">
+            <button type="button" class="btn-secondary" data-action="close-edit-profile">Cancel</button>
+            <button type="submit" class="btn-primary" id="btn-save-profile">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media Lightbox Modal -->
+  <div class="media-lightbox-backdrop" id="media-lightbox-modal" role="dialog" aria-modal="true" aria-label="Image preview" style="display: none;">
+    <button class="lightbox-close-btn" id="lightbox-close-btn" aria-label="Close image viewer">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <button class="lightbox-nav-btn lightbox-prev-btn" id="lightbox-prev-btn" aria-label="Previous image" style="display: none;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="lightbox-content" id="lightbox-content">
+      <img src="" alt="Enlarged photo" class="lightbox-img" id="lightbox-img">
+      <div class="lightbox-counter" id="lightbox-counter" style="display: none;"></div>
+    </div>
+    <button class="lightbox-nav-btn lightbox-next-btn" id="lightbox-next-btn" aria-label="Next image" style="display: none;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Toast Notification Mount Point -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="env.js" onerror="/* env.js is optional when .env is fetched directly */"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/feed.js"></script>
+  <script src="js/create.js"></script>
+  <script src="js/intro.js"></script>
+
+
+
+
+
+<script>
+window.addEventListener('load', () => {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('modal') === 'post') {
+    setTimeout(() => { if (window.UniVibeCreate) window.UniVibeCreate.openModal('post'); }, 100);
+  } else if (p.get('modal') === 'event') {
+    setTimeout(() => { if (window.UniVibeCreate) window.UniVibeCreate.openModal('event'); }, 100);
+  } else if (p.get('modal') === 'club') {
+    setTimeout(() => { if (window.UniVibeCreate) window.UniVibeCreate.openModal('club'); }, 100);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "univibes",
+  "version": "1.0.0",
+  "description": "UniVibe - Campus Social Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "start": "python -m http.server 3000",
+    "serve": "python -m http.server 3000"
+  },
+  "keywords": ["univibe", "campus", "social"],
+  "author": "",
+  "license": "ISC"
+}
