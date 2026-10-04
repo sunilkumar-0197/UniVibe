@@ -1502,10 +1502,15 @@ const UniVibeFeed = (() => {
 
     // View: Dedicated Campus General Chat View
     if (activeFilter === 'chat') {
+      document.body.classList.add('chat-view-active');
+      document.documentElement.classList.add('chat-view-active');
       if (window.UniVibeChat && typeof window.UniVibeChat.renderChatView === 'function') {
         window.UniVibeChat.renderChatView(feedContainer);
       }
       return;
+    } else {
+      document.body.classList.remove('chat-view-active');
+      document.documentElement.classList.remove('chat-view-active');
     }
 
     if (isLoading && posts.length === 0 && events.length === 0 && clubs.length === 0) {
@@ -4476,6 +4481,8 @@ const UniVibeFeed = (() => {
       if (window.UniVibeChat && typeof window.UniVibeChat.cleanup === 'function') {
         window.UniVibeChat.cleanup();
       }
+      document.body.classList.remove('chat-view-active');
+      document.documentElement.classList.remove('chat-view-active');
     }
     if (filterName !== 'club-community') {
       activeClubId = null;
