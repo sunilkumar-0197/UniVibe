@@ -916,6 +916,10 @@ body {
     overflow-x: hidden;
   }
 
+  .app-shell:has(.chat-view-container) .main-feed-area {
+    padding: 6px 10px calc(72px + env(safe-area-inset-bottom, 0px)) 10px;
+  }
+
   .campus-stories-header {
     padding: 0 2px;
     margin-bottom: 8px;

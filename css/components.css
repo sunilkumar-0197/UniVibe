@@ -50,6 +50,13 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* Hide Floating Create button on dedicated views where it is unnecessary or overlaps controls */
+.app-shell:has(.dedicated-post-view) .fab-create,
+.app-shell:has(.dedicated-event-view) .fab-create,
+.app-shell:has(.chat-view-container) .fab-create {
+  display: none !important;
+}
+
 /* Mobile FAB adjustment (Comfortably positioned above bottom navigation bar) */
 @media (max-width: 767px) {
   .fab-create {
@@ -60,7 +67,8 @@
   }
 
   .app-shell:has(.dedicated-post-view) .fab-create,
-  .app-shell:has(.dedicated-event-view) .fab-create {
+  .app-shell:has(.dedicated-event-view) .fab-create,
+  .app-shell:has(.chat-view-container) .fab-create {
     display: none !important;
   }
 }

@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/feed.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
 
@@ -262,6 +263,14 @@
             </a>
           </li>
           <li>
+            <a href="#chat" class="nav-item-link" onclick="UniVibeFeed.setFilter('chat')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Chat</span>
+            </a>
+          </li>
+          <li>
             <a href="#profile" class="nav-item-link" onclick="UniVibeFeed.setFilter('profile')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -410,18 +419,7 @@
         <span>Events</span>
       </a>
 
-      <!-- 2. Home (Central & Primary) -->
-      <a href="#home" class="bottom-nav-item nav-home-primary active" aria-current="page" onclick="UniVibeFeed.setFilter('all')">
-        <div class="home-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-        </div>
-        <span>Home</span>
-      </a>
-
-      <!-- 3. Clubs -->
+      <!-- 2. Clubs -->
       <a href="#clubs" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('clubs')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -432,7 +430,26 @@
         <span>Clubs</span>
       </a>
 
-      <!-- 4. Profile -->
+      <!-- 3. Home (Central & Primary) -->
+      <a href="#home" class="bottom-nav-item nav-home-primary active" aria-current="page" onclick="UniVibeFeed.setFilter('all')">
+        <div class="home-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <span>Home</span>
+      </a>
+
+      <!-- 4. Chat -->
+      <a href="#chat" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('chat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Chat</span>
+      </a>
+
+      <!-- 5. Profile -->
       <a href="#profile" class="bottom-nav-item" onclick="UniVibeFeed.setFilter('profile')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -884,6 +901,7 @@
   <script src="js/theme.js"></script>
   <script src="js/media.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
   <script src="js/feed.js"></script>
   <script src="js/create.js"></script>
   <script src="js/intro.js"></script>

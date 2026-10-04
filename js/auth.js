@@ -1314,6 +1314,7 @@ const UniVibeAuth = (() => {
     updateUserUI,
     updateProfile,
     loadUserProfile,
+    waitForAuth: () => authInitPromise,
     setAuthenticatedUser: (user) => { authenticatedUser = user; updateUserUI(); }
   };
 })();

@@ -205,9 +205,15 @@ const UniVibeFeed = (() => {
         activeFilter = 'clubs';
       } else if (hash === '#profile') {
         activeFilter = 'profile';
+      } else if (hash === '#chat') {
+        activeFilter = 'chat';
       }
       const urlFilter = (new URLSearchParams(window.location.search)).get('filter');
       if (urlFilter) activeFilter = urlFilter;
+      if (activeFilter === 'chat' || activeFilter === 'post-detail' || activeFilter === 'event-detail') {
+        const fabBtn = document.querySelector('.fab-create');
+        if (fabBtn) fabBtn.style.display = 'none';
+      }
     } catch (e) {}
 
     window.addEventListener('hashchange', () => {
@@ -230,6 +236,8 @@ const UniVibeFeed = (() => {
         setFilter('event');
       } else if (hash === '#profile') {
         setFilter('profile');
+      } else if (hash === '#chat') {
+        setFilter('chat');
       } else if (hash === '#home' || !hash) {
         setFilter('all');
       }
@@ -1468,15 +1476,6 @@ const UniVibeFeed = (() => {
       mainFeedHeader.style.display = (activeFilter === 'all' || activeFilter === 'campus-stories') ? '' : 'none';
     }
 
-    if (isLoading && posts.length === 0 && events.length === 0 && clubs.length === 0) {
-      feedContainer.innerHTML = `
-        <div class="feed-empty-state" style="opacity: 0.7;">
-          <p class="empty-state-subtitle">Loading vibes from campus...</p>
-        </div>
-      `;
-      return;
-    }
-
     // View: Dedicated Post Detail View
     if (activeFilter === 'post-detail' && activePostId) {
       renderPostDetailView(feedContainer, activePostId);
@@ -1501,8 +1500,25 @@ const UniVibeFeed = (() => {
       return;
     }
 
+    // View: Dedicated Campus General Chat View
+    if (activeFilter === 'chat') {
+      if (window.UniVibeChat && typeof window.UniVibeChat.renderChatView === 'function') {
+        window.UniVibeChat.renderChatView(feedContainer);
+      }
+      return;
+    }
+
+    if (isLoading && posts.length === 0 && events.length === 0 && clubs.length === 0) {
+      feedContainer.innerHTML = `
+        <div class="feed-empty-state" style="opacity: 0.7;">
+          <p class="empty-state-subtitle">Loading vibes from campus...</p>
+        </div>
+      `;
+      return;
+    }
+
     // Handle database connection error on posts
-    if (fetchError && activeFilter !== 'event' && activeFilter !== 'profile' && activeFilter !== 'event-detail') {
+    if (fetchError && activeFilter !== 'event' && activeFilter !== 'profile' && activeFilter !== 'event-detail' && activeFilter !== 'chat') {
       const isMissingTable = fetchError.code === 'PGRST205' || (fetchError.message && fetchError.message.includes('public.posts'));
       if (isMissingTable) {
         feedContainer.innerHTML = `
@@ -4456,6 +4472,11 @@ const UniVibeFeed = (() => {
   }
 
   function setFilter(filterName) {
+    if (activeFilter === 'chat' && filterName !== 'chat') {
+      if (window.UniVibeChat && typeof window.UniVibeChat.cleanup === 'function') {
+        window.UniVibeChat.cleanup();
+      }
+    }
     if (filterName !== 'club-community') {
       activeClubId = null;
     }
@@ -4473,6 +4494,8 @@ const UniVibeFeed = (() => {
       window.location.hash = '#events';
     } else if (filterName === 'profile' && window.location.hash !== '#profile') {
       window.location.hash = '#profile';
+    } else if (filterName === 'chat' && window.location.hash !== '#chat') {
+      window.location.hash = '#chat';
     } else if (filterName === 'all' && window.location.hash && window.location.hash !== '#home') {
       window.location.hash = '#home';
     }
@@ -4491,14 +4514,25 @@ const UniVibeFeed = (() => {
         item.classList.add('active');
       } else if (filterName === 'profile' && href === '#profile') {
         item.classList.add('active');
+      } else if (filterName === 'chat' && href === '#chat') {
+        item.classList.add('active');
       } else if (filterName === 'all' && (href === '#home' || !href)) {
         item.classList.add('active');
       } else if (href === `#${filterName}`) {
         item.classList.add('active');
-      } else if (href === '#home' || href === '#events' || href === '#clubs' || href === '#profile') {
+      } else if (href === '#home' || href === '#events' || href === '#clubs' || href === '#profile' || href === '#chat') {
         item.classList.remove('active');
       }
     });
+
+    const fabBtn = document.querySelector('.fab-create');
+    if (fabBtn) {
+      if (filterName === 'chat' || filterName === 'post-detail' || filterName === 'event-detail') {
+        fabBtn.style.display = 'none';
+      } else {
+        fabBtn.style.display = '';
+      }
+    }
 
     renderFeed();
   }
