@@ -53,10 +53,15 @@
 /* Mobile FAB adjustment (Comfortably positioned above bottom navigation bar) */
 @media (max-width: 767px) {
   .fab-create {
-    bottom: 74px;
-    right: 20px;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    right: 18px;
     padding: 13px 18px;
     font-size: 0.875rem;
+  }
+
+  .app-shell:has(.dedicated-post-view) .fab-create,
+  .app-shell:has(.dedicated-event-view) .fab-create {
+    display: none !important;
   }
 }
 

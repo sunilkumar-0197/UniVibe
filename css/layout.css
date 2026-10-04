@@ -412,7 +412,7 @@ body {
   z-index: var(--z-nav);
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-subtle);
-  padding: 6px var(--space-xs) calc(6px + env(safe-area-inset-bottom));
+  padding: 6px var(--space-xs) calc(6px + env(safe-area-inset-bottom, 0px));
   align-items: center;
   justify-content: space-around;
   box-shadow: var(--shadow-md);
@@ -908,7 +908,7 @@ body {
   }
 
   .main-feed-area {
-    padding: 10px 12px 84px 12px;
+    padding: 10px 12px calc(98px + env(safe-area-inset-bottom, 0px)) 12px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
